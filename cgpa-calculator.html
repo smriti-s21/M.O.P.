@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GPA & CGPA Calculator — MOP Vaishnav</title>
+<style>
+  :root {
+    --red: #c0152a;
+    --blue: #1a3a8f;
+    --green: #1a7a3c;
+    --white: #ffffff;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    min-height: 100vh;
+    background: linear-gradient(160deg, var(--blue) 0%, #0f2460 60%, var(--red) 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 36px 20px 60px;
+  }
+
+  /* ── Header ── */
+  .college-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+
+  .college-logo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 3px solid var(--white);
+    object-fit: cover;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  }
+
+  .college-name {
+    color: white;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    text-align: center;
+    opacity: 0.92;
+  }
+
+  h1 {
+    color: white;
+    font-size: 1.8rem;
+    margin-top: 6px;
+    margin-bottom: 6px;
+    letter-spacing: 1px;
+    text-align: center;
+  }
+
+  .subtitle {
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 8px;
+    font-size: 0.82rem;
+    text-align: center;
+    font-style: italic;
+  }
+
+  .disclaimer {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.25);
+    color: rgba(255,255,255,0.85);
+    font-size: 0.75rem;
+    padding: 7px 18px;
+    border-radius: 20px;
+    margin-bottom: 28px;
+    text-align: center;
+  }
+
+  .btn-group {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .tab-btn {
+    padding: 11px 28px;
+    border: 2px solid white;
+    background: transparent;
+    color: white;
+    border-radius: 30px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.25s;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+
+  .tab-btn.active, .tab-btn:hover {
+    background: white;
+    color: var(--blue);
+  }
+
+  .card {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    width: 100%;
+    max-width: 720px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    border-top: 5px solid var(--red);
+  }
+
+  .section-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--blue);
+    margin-bottom: 20px;
+  }
+
+  .sem-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+
+  .sem-tab {
+    padding: 6px 16px;
+    border: 2px solid var(--blue);
+    background: transparent;
+    color: var(--blue);
+    border-radius: 20px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 600;
+  }
+
+  .sem-tab.active { background: var(--blue); color: white; }
+
+  .subject-row {
+    display: grid;
+    grid-template-columns: 2fr 1.5fr 1fr auto;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 12px;
+    animation: fadeIn 0.2s ease;
+  }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+
+  .subject-row input {
+    padding: 10px 12px;
+    border: 1.5px solid #dde3f0;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border 0.2s;
+    width: 100%;
+  }
+
+  .subject-row input:focus { border-color: var(--blue); }
+  .subject-row input::placeholder { color: #bbb; }
+
+  .remove-btn {
+    background: var(--red);
+    border: none;
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+    flex-shrink: 0;
+  }
+
+  .remove-btn:hover { background: #8f0f1e; }
+
+  .col-labels {
+    display: grid;
+    grid-template-columns: 2fr 1.5fr 1fr auto;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+
+  .col-labels span {
+    font-size: 0.75rem;
+    color: #999;
+    font-weight: 500;
+    padding-left: 4px;
+  }
+
+  .add-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: 2px dashed #b0bcd8;
+    color: #888;
+    padding: 10px 18px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    margin-top: 8px;
+    transition: all 0.2s;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .add-btn:hover { border-color: var(--blue); color: var(--blue); background: #f0f4ff; }
+
+  .result-box {
+    margin-top: 24px;
+    background: linear-gradient(135deg, var(--blue), #0f2460);
+    border-radius: 14px;
+    padding: 20px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-left: 6px solid var(--green);
+  }
+
+  .result-label { color: rgba(255,255,255,0.8); font-size: 0.95rem; }
+
+  .result-value {
+    color: white;
+    font-size: 2.4rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+
+  .result-grade {
+    color: #7fffaa;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-top: 2px;
+  }
+
+  .sem-summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 20px;
+    margin-bottom: 4px;
+  }
+
+  .sem-chip {
+    background: #f0f4ff;
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #dde3f0;
+  }
+
+  .sem-chip .chip-label { font-size: 0.72rem; color: #888; font-weight: 600; }
+  .sem-chip .chip-val { font-size: 1.1rem; font-weight: 700; color: var(--blue); }
+
+  .footer-credit {
+    margin-top: 28px;
+    color: rgba(255,255,255,0.5);
+    font-size: 0.75rem;
+    text-align: center;
+  }
+
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+
+<div class="college-header">
+  <img class="college-logo" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSPduc49KB4bT04e9B6OKJr8svOfq-W3xdxjw&s" alt="MOP Vaishnav College Logo">
+  <div class="college-name">M.O.P. Vaishnav College for Women</div>
+</div>
+
+<h1>📚 GPA & CGPA Calculator</h1>
+<p class="subtitle">For reference purposes only &mdash; results may vary from official records</p>
+<div class="disclaimer">⚠️ This tool is for self-checking only. Please verify with your official marksheet.</div>
+
+<div class="btn-group">
+  <button class="tab-btn active" onclick="showTab('gpa')">📖 GPA Calculator</button>
+  <button class="tab-btn" onclick="showTab('cgpa')">🎓 CGPA Calculator</button>
+</div>
+
+<!-- GPA Calculator -->
+<div class="card" id="gpa-section">
+  <div class="section-title">Semester GPA Calculator</div>
+  <div class="col-labels">
+    <span>Subject Name</span>
+    <span>Marks (Theory + Practical)</span>
+    <span>Credits</span>
+    <span></span>
+  </div>
+  <div id="gpa-subjects"></div>
+  <button class="add-btn" onclick="addSubject('gpa')">＋ Add Subject</button>
+  <div class="result-box" id="gpa-result-box">
+    <div>
+      <div class="result-label">Your GPA</div>
+      <div class="result-grade" id="gpa-grade">—</div>
+    </div>
+    <div class="result-value" id="gpa-result">—</div>
+  </div>
+</div>
+
+<!-- CGPA Calculator -->
+<div class="card hidden" id="cgpa-section">
+  <div class="section-title">CGPA Calculator (6 Semesters)</div>
+  <div class="sem-tabs" id="sem-tabs"></div>
+  <div class="col-labels">
+    <span>Subject Name</span>
+    <span>Marks (Theory + Practical)</span>
+    <span>Credits</span>
+    <span></span>
+  </div>
+  <div id="cgpa-subjects"></div>
+  <button class="add-btn" onclick="addSubject('cgpa')">＋ Add Subject</button>
+
+  <div class="sem-summary" id="sem-summary"></div>
+
+  <div class="result-box" style="margin-top:16px">
+    <div>
+      <div class="result-label">Your CGPA</div>
+      <div class="result-grade" id="cgpa-grade">—</div>
+    </div>
+    <div class="result-value" id="cgpa-result">—</div>
+  </div>
+</div>
+
+<div class="footer-credit">Made with ♥ by Smriti &nbsp;|&nbsp; MOP Vaishnav College</div>
+
+<script>
+  // ── State ──────────────────────────────────────────────
+  let gpaSubjects = [];
+  let cgpaData = {}; // { sem: [{name,marks,credits}] }
+  let activeSem = 1;
+
+  for (let i = 1; i <= 6; i++) cgpaData[i] = [];
+
+  // ── Tab switching ──────────────────────────────────────
+  function showTab(tab) {
+    document.getElementById('gpa-section').classList.toggle('hidden', tab !== 'gpa');
+    document.getElementById('cgpa-section').classList.toggle('hidden', tab !== 'cgpa');
+    document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', (i === 0) === (tab === 'gpa')));
+  }
+
+  // ── Grade helper ───────────────────────────────────────
+  function getGrade(gpa) {
+    if (gpa >= 9) return 'Outstanding 🌟';
+    if (gpa >= 8) return 'Excellent ✨';
+    if (gpa >= 7) return 'Very Good 👍';
+    if (gpa >= 6) return 'Good 🙂';
+    if (gpa >= 5) return 'Average';
+    return 'Below Average';
+  }
+
+  // ── Render ─────────────────────────────────────────────
+  function renderGPA() {
+    const container = document.getElementById('gpa-subjects');
+    container.innerHTML = '';
+    gpaSubjects.forEach((s, i) => {
+      container.appendChild(makeRow(s, i, 'gpa'));
+    });
+    calcGPA();
+  }
+
+  function renderCGPA() {
+    // Sem tabs
+    const tabsEl = document.getElementById('sem-tabs');
+    tabsEl.innerHTML = '';
+    for (let i = 1; i <= 6; i++) {
+      const b = document.createElement('button');
+      b.className = 'sem-tab' + (i === activeSem ? ' active' : '');
+      b.textContent = `Sem ${i}`;
+      b.onclick = () => { activeSem = i; renderCGPA(); };
+      tabsEl.appendChild(b);
+    }
+
+    // Subjects for active sem
+    const container = document.getElementById('cgpa-subjects');
+    container.innerHTML = '';
+    cgpaData[activeSem].forEach((s, i) => {
+      container.appendChild(makeRow(s, i, 'cgpa'));
+    });
+
+    calcCGPA();
+  }
+
+  function makeRow(s, i, mode) {
+    const row = document.createElement('div');
+    row.className = 'subject-row';
+    row.innerHTML = `
+      <input type="text" placeholder="Subject name" value="${s.name}" oninput="update('${mode}',${i},'name',this.value)">
+      <input type="number" placeholder="e.g. 85" min="0" max="100" value="${s.marks}" oninput="update('${mode}',${i},'marks',this.value)">
+      <input type="number" placeholder="e.g. 4" min="1" max="10" value="${s.credits}" oninput="update('${mode}',${i},'credits',this.value)">
+      <button class="remove-btn" onclick="removeSubject('${mode}',${i})">−</button>
+    `;
+    return row;
+  }
+
+  // ── CRUD ───────────────────────────────────────────────
+  function addSubject(mode) {
+    const obj = { name: '', marks: '', credits: '' };
+    if (mode === 'gpa') { gpaSubjects.push(obj); renderGPA(); }
+    else { cgpaData[activeSem].push(obj); renderCGPA(); }
+  }
+
+  function removeSubject(mode, i) {
+    if (mode === 'gpa') { gpaSubjects.splice(i, 1); renderGPA(); }
+    else { cgpaData[activeSem].splice(i, 1); renderCGPA(); }
+  }
+
+  function update(mode, i, field, val) {
+    if (mode === 'gpa') { gpaSubjects[i][field] = val; calcGPA(); }
+    else { cgpaData[activeSem][i][field] = val; calcCGPA(); }
+  }
+
+  // ── Calculations ───────────────────────────────────────
+  function calcForSubjects(subjects) {
+    let totalCredits = 0, weightedSum = 0;
+    subjects.forEach(s => {
+      const m = parseFloat(s.marks), c = parseFloat(s.credits);
+      if (!isNaN(m) && !isNaN(c) && c > 0 && m >= 0 && m <= 100) {
+        weightedSum += (m / 10) * c;
+        totalCredits += c;
+      }
+    });
+    return totalCredits > 0 ? weightedSum / totalCredits : null;
+  }
+
+  function calcGPA() {
+    const gpa = calcForSubjects(gpaSubjects);
+    const el = document.getElementById('gpa-result');
+    const gr = document.getElementById('gpa-grade');
+    if (gpa !== null) {
+      el.textContent = gpa.toFixed(3);
+      gr.textContent = getGrade(gpa);
+    } else {
+      el.textContent = '—';
+      gr.textContent = '—';
+    }
+  }
+
+  function calcCGPA() {
+    // Per-sem GPA summary
+    const summary = document.getElementById('sem-summary');
+    summary.innerHTML = '';
+    let totalCredits = 0, totalWeighted = 0;
+
+    for (let i = 1; i <= 6; i++) {
+      const gpa = calcForSubjects(cgpaData[i]);
+      const chip = document.createElement('div');
+      chip.className = 'sem-chip';
+      chip.innerHTML = `<div class="chip-label">Sem ${i}</div><div class="chip-val">${gpa !== null ? gpa.toFixed(3) : '—'}</div>`;
+      summary.appendChild(chip);
+
+      // Accumulate for CGPA
+      cgpaData[i].forEach(s => {
+        const m = parseFloat(s.marks), c = parseFloat(s.credits);
+        if (!isNaN(m) && !isNaN(c) && c > 0 && m >= 0 && m <= 100) {
+          totalWeighted += (m / 10) * c;
+          totalCredits += c;
+        }
+      });
+    }
+
+    const cgpa = totalCredits > 0 ? totalWeighted / totalCredits : null;
+    document.getElementById('cgpa-result').textContent = cgpa !== null ? cgpa.toFixed(3) : '—';
+    document.getElementById('cgpa-grade').textContent = cgpa !== null ? getGrade(cgpa) : '—';
+  }
+
+  // ── Init ───────────────────────────────────────────────
+  addSubject('gpa');
+  renderCGPA();
+  addSubject('cgpa');
+</script>
+</body>
+</html>
